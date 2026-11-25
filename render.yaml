@@ -1,0 +1,19 @@
+# Render Blueprint —— 把本文件放在仓库根目录，Render 会自动按它创建服务，实现「一键部署」。
+# 用法：Render Dashboard → New → Blueprint → 连接 GitHub 仓库 → Apply
+# 文档：https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: cube-tactics
+    runtime: node
+    plan: free
+    # 部署时先装齐 devDependencies（vite/typescript 是构建期依赖），再打包前端
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    # 平台会轮询该路径，返回 200 才切换流量
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      # 标记为云端：退出按钮不会结束容器进程，二维码使用公网域名
+      - key: CLOUD_DEPLOY
+        value: "1"
